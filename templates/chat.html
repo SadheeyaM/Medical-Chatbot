@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Medical Chatbot</title>
+<link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+
+<div class="chat-container">
+  <div class="chat-header">Medical Chatbot</div>
+
+  <div class="chat-messages" id="chat-messages">
+    <div class="message ai">Hello! I am your medical assistant. How can I help you today?</div>
+  </div>
+
+  <div class="chat-input">
+    <input type="text" id="user-input" placeholder="Type your message..."/>
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<script>
+  const messagesContainer = document.getElementById('chat-messages');
+  const userInput = document.getElementById('user-input');
+
+  function sendMessage() {
+    const text = userInput.value.trim();
+    if (!text) return;
+
+    const userMessage = document.createElement('div');
+    userMessage.classList.add('message', 'user');
+    userMessage.innerText = text;
+    messagesContainer.appendChild(userMessage);
+
+    userInput.value = '';
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+    fetch('/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `msg=${encodeURIComponent(text)}`
+    })
+    .then(response => response.text())
+    .then(data => {
+      const aiMessage = document.createElement('div');
+      aiMessage.classList.add('message', 'ai');
+      aiMessage.innerText = data;
+      messagesContainer.appendChild(aiMessage);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    })
+    .catch(() => {
+      const aiMessage = document.createElement('div');
+      aiMessage.classList.add('message', 'ai');
+      aiMessage.innerText = 'Sorry, there was an error getting a response.';
+      messagesContainer.appendChild(aiMessage);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    });
+  }
+
+  userInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendMessage();
+  });
+</script>
+
+</body>
+</html>
