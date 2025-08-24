@@ -1,17 +1,19 @@
-from flask import Flask, render_template, jsonify, request
-from src.helpers import load_pdf_files, filter_to_minimal_docs, text_splitter, download_embeddings
-from langchain_pinecone import PineconeVectorStore
+import os
+from typing import List, Optional
+
 import google.generativeai as genai
-from langchain.llms.base import LLM
-from typing import Optional, List
-from pydantic import PrivateAttr
+from dotenv import load_dotenv
+from flask import Flask, jsonify, render_template, request
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain.llms.base import LLM
 from langchain_core.prompts import ChatPromptTemplate
-from dotenv import load_dotenv
-from src.prompt import *
-import os
+from langchain_pinecone import PineconeVectorStore
+from pydantic import PrivateAttr
 
+from src.helpers import (download_embeddings, filter_to_minimal_docs,
+                         load_pdf_files, text_splitter)
+from src.prompt import *
 
 app = Flask(__name__)
 
@@ -78,4 +80,4 @@ def chat():
     return str(reponse["answer"])
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port= 8080, debug=True)
+    app.run(host="0.0.0.0", port=8080, debug=True)
